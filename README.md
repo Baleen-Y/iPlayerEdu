@@ -1,1 +1,1 @@
-# iPlayerG2
+# iPlayerEdu
