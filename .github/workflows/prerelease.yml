@@ -43,9 +43,6 @@ jobs:
       - name: Add GitLab to known_hosts with RSA key type
         run: |
           ssh-keyscan -t rsa -H gitlab.integem.co >> $env:USERPROFILE\.ssh\known_hosts
-
-      - name: Test SSH connection with verbose output
-        run: ssh -vT git@gitlab.integem.co
       - name: List loaded SSH keys
         run: ssh-add -l
       - name: Add SSH key to agent manually
@@ -56,7 +53,7 @@ jobs:
           
       - name: Test SSH connection
         if: startsWith(matrix.os, 'windows')
-        run: ssh -T git@gitlab.integem.co
+        run: ssh -vT git@gitlab.integem.co
 
       - name: clone
         run: |
