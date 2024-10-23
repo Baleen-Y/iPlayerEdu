@@ -44,12 +44,12 @@ jobs:
           icacls C:\Users\runneradmin\.ssh\id_rsa /inheritance:r /grant:r "SYSTEM:F"
           icacls C:\Users\runneradmin\.ssh\id_rsa /remove "BUILTIN\Users"
           ssh-keyscan -H gitlab.integem.co >> C:\Users\runneradmin\.ssh\known_hosts
-
-      # 启动 ssh-agent 并添加私钥
+      # 手动启动 ssh-agent 并添加私钥
       - name: Start ssh-agent and add private key
+        shell: bash
         run: |
-          Start-Service ssh-agent
-          ssh-add C:\Users\runneradmin\.ssh\id_rsa
+          eval $(ssh-agent -s)  # 启动 ssh-agent
+          ssh-add C:\Users\runneradmin\.ssh\id_rsa  # 添加私钥
 
       # 列出已加载的 SSH 密钥，确保私钥已加载
       - name: List loaded SSH keys
