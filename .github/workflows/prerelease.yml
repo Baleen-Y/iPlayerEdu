@@ -43,10 +43,11 @@ jobs:
       - name: Add GitLab to known_hosts with RSA key type
         run: |
           ssh-keyscan -t rsa -H gitlab.integem.co >> $env:USERPROFILE\.ssh\known_hosts
-      - name: List loaded SSH keys
-        run: ssh-add -l
+      
       - name: Add SSH key to agent manually
         run: ssh-add ~/.ssh/id_rsa
+      - name: List loaded SSH keys
+        run: ssh-add -l
       - name: Test SSH connection with timeout
         run: ssh -o ConnectTimeout=30 -T git@gitlab.integem.co
 
