@@ -27,9 +27,14 @@ jobs:
           node-version: 16 #lts/*
           
       - name: Set up SSH for private repository
-        uses: webfactory/ssh-agent@v0.7.0
+        uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
+          
+      - name: Add GitLab to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H gitlab.integem.co >> ~/.ssh/known_hosts
           
       - name: Test SSH connection
         if: startsWith(matrix.os, 'windows')
