@@ -35,12 +35,17 @@ jobs:
         run: |
           mkdir C:\Users\runneradmin\.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > C:\Users\runneradmin\.ssh\id_rsa
+          # 设置权限：移除 BUILTIN\Users 用户组的权限，确保私钥仅对当前用户可访问
           icacls C:\Users\runneradmin\.ssh\id_rsa /inheritance:r /grant:r "Administrators:F"
           icacls C:\Users\runneradmin\.ssh\id_rsa /inheritance:r /grant:r "SYSTEM:F"
-          icacls C:\Users\runneradmin\.ssh\id_rsa /inheritance:r /grant:r "Users:F"
+          icacls C:\Users\runneradmin\.ssh\id_rsa /remove "BUILTIN\Users"
+          icacls C:\Users\runneradmin\.ssh\id_rsa /remove "Users"
+          
+          # 将 GitLab 主机添加到 known_hosts
           ssh-keyscan -H gitlab.integem.co >> C:\Users\runneradmin\.ssh\known_hosts
           
       - name: Test SSH connection
+        if: startsWith(matrix.os, 'windows')
         run: ssh -T git@gitlab.integem.co
 
       - name: clone
