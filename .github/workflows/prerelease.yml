@@ -23,6 +23,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16 #lts/*
+          
+      - name: Set up SSH for private repository
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
 
       - name: clone
         run: |
