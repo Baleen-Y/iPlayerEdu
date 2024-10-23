@@ -47,9 +47,7 @@ jobs:
       - name: Start ssh-agent and add private key
         if: startsWith(matrix.os, 'windows')
         run: |
-          Start-Service ssh-agent
-          ssh-add C:\Users\runneradmin\.ssh\id_rsa
-          ssh-add -l # 列出已添加的密钥，确保密钥成功加载
+          git config core.sshCommand "C:/Program Files/Git/usr/bin/ssh.exe"
       - name: Test SSH connection
         if: startsWith(matrix.os, 'windows')
         run: ssh -T git@gitlab.integem.co
