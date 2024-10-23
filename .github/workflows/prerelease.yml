@@ -34,14 +34,21 @@ jobs:
             New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.ssh"
           }
 
+      # 添加 SSH 私钥并设置权限
       - name: Add SSH key and set permissions
         if: startsWith(matrix.os, 'windows')
+        shell: powershell
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          icacls ~/.ssh/id_rsa /inheritance:r /grant:r "Administrators:F"
-          icacls ~/.ssh/id_rsa /inheritance:r /grant:r "SYSTEM:F"
-          icacls ~/.ssh/id_rsa /remove "BUILTIN\Users"
-          ssh-keyscan -H gitlab.integem.co >> ~/.ssh/known_hosts
+          $privateKeyPath = "$env:USERPROFILE\.ssh\id_rsa"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $privateKeyPath
+          icacls $privateKeyPath /inheritance:r /grant:r "Administrators:F"
+          icacls $privateKeyPath /inheritance:r /grant:r "SYSTEM:F"
+          icacls $privateKeyPath /remove "BUILTIN\Users"
+
+      # 将 GitLab 添加到 known_hosts
+      - name: Add GitLab to known_hosts
+        if: startsWith(matrix.os, 'windows')
+        run: ssh-keyscan -H gitlab.integem.co >> C:\Users\runneradmin\.ssh\known_hosts
           
       - name: Test SSH connection
         if: startsWith(matrix.os, 'windows')
