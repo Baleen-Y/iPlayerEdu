@@ -40,9 +40,10 @@ jobs:
           }
 
       # 将 GitLab 添加到 known_hosts
-      - name: Add GitLab to known_hosts
-        if: startsWith(matrix.os, 'windows')
-        run: ssh-keyscan -H gitlab.integem.co >> C:\Users\runneradmin\.ssh\known_hosts
+      - name: Add GitLab to known_hosts with RSA key type
+        run: |
+          ssh-keyscan -t rsa -H gitlab.integem.co >> $env:USERPROFILE\.ssh\known_hosts
+
           
       - name: Test SSH connection
         if: startsWith(matrix.os, 'windows')
