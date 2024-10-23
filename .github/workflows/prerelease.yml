@@ -39,11 +39,8 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         shell: powershell
         run: |
-          $privateKeyPath = "$env:USERPROFILE\.ssh\id_rsa"
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $privateKeyPath
-          icacls $privateKeyPath /inheritance:r /grant:r "Administrators:F"
-          icacls $privateKeyPath /inheritance:r /grant:r "SYSTEM:F"
-          icacls $privateKeyPath /remove "BUILTIN\Users"
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
       # 将 GitLab 添加到 known_hosts
       - name: Add GitLab to known_hosts
