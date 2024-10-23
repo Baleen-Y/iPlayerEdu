@@ -26,14 +26,21 @@ jobs:
         with:
           node-version: 16 #lts/*
           
-      - name: Set up SSH for private repository
-        uses: webfactory/ssh-agent@v0.6.0
-        with:
-          ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
-          
-      - name: Add GitLab to known_hosts
+      - name: Create .ssh directory if it does not exist
+        if: startsWith(matrix.os, 'windows')
+        shell: powershell
         run: |
-          mkdir -p ~/.ssh
+          if (-Not (Test-Path -Path "$env:USERPROFILE\.ssh")) {
+            New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.ssh"
+          }
+
+      - name: Add SSH key and set permissions
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          icacls ~/.ssh/id_rsa /inheritance:r /grant:r "Administrators:F"
+          icacls ~/.ssh/id_rsa /inheritance:r /grant:r "SYSTEM:F"
+          icacls ~/.ssh/id_rsa /remove "BUILTIN\Users"
           ssh-keyscan -H gitlab.integem.co >> ~/.ssh/known_hosts
           
       - name: Test SSH connection
