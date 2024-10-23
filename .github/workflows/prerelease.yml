@@ -25,15 +25,9 @@ jobs:
           node-version: 16 #lts/*
           
       - name: Set up SSH for private repository
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
-          
-      - name: Add GitHub to the SSH known hosts file
-        if: startsWith(matrix.os, 'windows')
-        run: |
-          curl -L -o jq.exe https://github.com/jqlang/jq/releases/latest/download/jq-win64.exe
-          curl --silent https://api.github.com/meta | jq --raw-output "\"github.com \"+.ssh_keys[]" >> %USERPROFILE%/.ssh/known_hosts
 
       - name: clone
         run: |
