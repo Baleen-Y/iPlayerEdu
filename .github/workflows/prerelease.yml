@@ -40,7 +40,7 @@ jobs:
         shell: bash
 
       - name: install
-        run: npm i --legacy-peer-deps
+        run: npm i --legacy-peer-deps --verbose
 
       - name: rmi:old
         run: npm run rmi:old
