@@ -44,6 +44,15 @@ jobs:
         run: |
           ssh-keyscan -t rsa -H gitlab.integem.co >> $env:USERPROFILE\.ssh\known_hosts
 
+      - name: Test SSH connection with verbose output
+        run: ssh -vT git@gitlab.integem.co
+      - name: List loaded SSH keys
+        run: ssh-add -l
+      - name: Add SSH key to agent manually
+        run: ssh-add ~/.ssh/id_rsa
+      - name: Test SSH connection with timeout
+        run: ssh -o ConnectTimeout=30 -T git@gitlab.integem.co
+
           
       - name: Test SSH connection
         if: startsWith(matrix.os, 'windows')
