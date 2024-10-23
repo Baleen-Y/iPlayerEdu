@@ -14,6 +14,8 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest]
     runs-on: ${{matrix.os}}
+    env:
+      CARGO_NET_GIT_FETCH_WITH_CLI: true
 
     steps:
       - name: init
@@ -25,29 +27,10 @@ jobs:
           node-version: 16 #lts/*
           
       - name: Set up SSH for private repository
-        if: startsWith(matrix.os, 'macOS')
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{secrets.SSH_PRIVATE_KEY}}
-
-      - name: Set up SSH for Windows
-        if: startsWith(matrix.os, 'windows')
-        run: |
-          mkdir C:\Users\runneradmin\.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > C:\Users\runneradmin\.ssh\id_rsa
-          # 设置权限：移除 BUILTIN\Users 用户组的权限，确保私钥仅对当前用户可访问
-          icacls C:\Users\runneradmin\.ssh\id_rsa /inheritance:r /grant:r "Administrators:F"
-          icacls C:\Users\runneradmin\.ssh\id_rsa /inheritance:r /grant:r "SYSTEM:F"
-          icacls C:\Users\runneradmin\.ssh\id_rsa /remove "BUILTIN\Users"
-          icacls C:\Users\runneradmin\.ssh\id_rsa /remove "Users"
           
-          # 将 GitLab 主机添加到 known_hosts
-          ssh-keyscan -H gitlab.integem.co >> C:\Users\runneradmin\.ssh\known_hosts
-
-      - name: Start ssh-agent and add private key
-        if: startsWith(matrix.os, 'windows')
-        run: |
-          git config core.sshCommand "C:/Program Files/Git/usr/bin/ssh.exe"
       - name: Test SSH connection
         if: startsWith(matrix.os, 'windows')
         run: ssh -T git@gitlab.integem.co
