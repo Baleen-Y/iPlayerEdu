@@ -30,11 +30,15 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16 #lts/*
-          
+      - name: Create .ssh directory if it does not exist
+        shell: powershell
+        run: |
+          if (-Not (Test-Path -Path "$env:USERPROFILE\.ssh")) {
+            New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.ssh"
+          }
       # 创建 .ssh 目录并添加 SSH 私钥
       - name: Create .ssh directory and add SSH private key
         run: |
-          mkdir C:\Users\runneradmin\.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > C:\Users\runneradmin\.ssh\id_rsa
           icacls C:\Users\runneradmin\.ssh\id_rsa /inheritance:r /grant:r "Administrators:F"
           icacls C:\Users\runneradmin\.ssh\id_rsa /inheritance:r /grant:r "SYSTEM:F"
