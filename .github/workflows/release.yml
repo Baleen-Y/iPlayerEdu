@@ -17,7 +17,7 @@ on:
 jobs:
   release:
     name: release
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: init
@@ -41,3 +41,23 @@ jobs:
           fail_on_unmatched_files: false
           append_body: true
           files: release/*
+      
+      # 安装 b2 CLI
+      - name: Install b2 CLI
+        run: |
+          pip install b2
+
+      # 授权 B2 账户
+      - name: Authorize B2 Account
+        run: |
+          b2 authorize-account ${{ secrets.B2_KEY_ID }} ${{ secrets.B2_APPLICATION_KEY }}
+      
+      # 上传 .dmg 文件到 B2 指定路径
+      - name: Upload .dmg to B2
+        run: |
+          b2 upload-file ${{ secrets.B2_BUCKET_NAME }} release/*.dmg "software/iPlayer Edu.dmg"
+
+      # 上传 .exe 文件到 B2 指定路径
+      - name: Upload .exe to B2
+        run: |
+          b2 upload-file ${{ secrets.B2_BUCKET_NAME }} release/*.exe "software/iPlayer Edu.exe"
