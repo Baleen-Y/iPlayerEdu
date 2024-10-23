@@ -20,6 +20,10 @@ jobs:
     steps:
       - name: init
         uses: actions/checkout@v4
+      - name: init
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: set node
         uses: actions/setup-node@v2
@@ -33,14 +37,6 @@ jobs:
           if (-Not (Test-Path -Path "$env:USERPROFILE\.ssh")) {
             New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.ssh"
           }
-
-      # 添加 SSH 私钥并设置权限
-      - name: Add SSH key and set permissions
-        if: startsWith(matrix.os, 'windows')
-        shell: powershell
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
 
       # 将 GitLab 添加到 known_hosts
       - name: Add GitLab to known_hosts
