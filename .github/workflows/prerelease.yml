@@ -47,12 +47,15 @@ jobs:
         shell: bash
         run: |
           sed -i 's|git+ssh://git@gitlab.integem.co:jingxu.yang/igame.git|${{ secrets.IGAME_GIT_ADDRESS }}|' package.json
-      - name: Restore original package.json
-        run: mv package.json.bak package.json
+
         
 
       - name: install
         run: npm i --legacy-peer-deps
+      - name: Remove original package.json
+        run: rm package.json
+      - name: Restore original package.json
+        run: mv package.json.bak package.json
       - name: rmi:old
         run: npm run rmi:old
 
