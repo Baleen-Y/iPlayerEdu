@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest]
+        os: [windows-latest]
     runs-on: ${{matrix.os}}
     env:
       CARGO_NET_GIT_FETCH_WITH_CLI: true
@@ -25,6 +25,14 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Set up SSH for private repo access
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan gitlab.integem.co >> ~/.ssh/known_hosts
 
       - name: set node
         uses: actions/setup-node@v2
@@ -47,9 +55,11 @@ jobs:
         run: npm run rmi:old
 
       - name: win
+        if: startsWith(matrix.os, 'windows')
         run: npm run app:windows
 
       - name: mac
+        if: startsWith(matrix.os, 'macOS')
         run: |
           npm run build:prod
           npm run mac:dmg
