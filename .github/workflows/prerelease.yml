@@ -47,7 +47,8 @@ jobs:
         shell: bash
         run: |
           sed -i 's|git+ssh://git@gitlab.integem.co:jingxu.yang/igame.git|${{ secrets.IGAME_GIT_ADDRESS }}|' package.json
-
+      - name: Verify package.json modification
+        run: cat package.json
         
 
       - name: install
