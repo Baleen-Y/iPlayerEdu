@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        os: [macos-latest, windows-latest]
     runs-on: ${{matrix.os}}
     env:
       CARGO_NET_GIT_FETCH_WITH_CLI: true
@@ -20,11 +20,6 @@ jobs:
     steps:
       - name: init
         uses: actions/checkout@v4
-        
-      - name: Set up SSH for private repository
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: set node
         uses: actions/setup-node@v2
@@ -45,8 +40,13 @@ jobs:
         run: git clone ${{ secrets.IGAME_GIT_ADDRESS }} ./igame
 
       - name: Modify package.json to point to local igame
+        if: startsWith(matrix.os, 'windows')
         run: |
           sed -i 's|"igame": ".*"|"igame": "file:./igame"|' package.json
+      - name: Modify package.json to point to local igame
+        if: startsWith(matrix.os, 'macOS')
+        run: |
+          sed -i '' 's|"igame": ".*"|"igame": "file:./igame"|' package.json
 
 
       
