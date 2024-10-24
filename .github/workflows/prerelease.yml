@@ -41,22 +41,17 @@ jobs:
           git clone -b dev ${{secrets.GIT_ADDRESS}} .
         shell: bash
 
-      - name: Backup original package.json
-        run: cp package.json package.json.bak
-      - name: Modify package.json to use the git address with username and password
-        shell: bash
-        run: |
-          sed -i 's|git+ssh://git@gitlab.integem.co:jingxu.yang/igame.git|${{ secrets.IGAME_GIT_ADDRESS }}|' package.json
-      - name: Verify package.json modification
-        run: cat package.json
-        
+      - name: Clone igame repository
+        run: git clone ${{ secrets.IGAME_GIT_ADDRESS }} ./igame
 
+      - name: Modify package.json to point to local igame
+        run: |
+          sed -i 's|"igame": ".*"|"igame": "file:./igame"|' package.json
+
+
+      
       - name: install
         run: npm i --legacy-peer-deps
-      - name: Remove original package.json
-        run: rm package.json
-      - name: Restore original package.json
-        run: mv package.json.bak package.json
       - name: rmi:old
         run: npm run rmi:old
 
