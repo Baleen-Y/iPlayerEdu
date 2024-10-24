@@ -27,12 +27,14 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Set up SSH for private repo access
-        if: startsWith(matrix.os, 'windows')
+        shell: powershell
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan gitlab.integem.co >> ~/.ssh/known_hosts
+          if (-Not (Test-Path -Path $env:USERPROFILE\.ssh)) {
+            mkdir $env:USERPROFILE\.ssh
+          }
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | Out-File -FilePath $env:USERPROFILE\.ssh\id_rsa -Encoding ascii
+          chmod 600 $env:USERPROFILE\.ssh\id_rsa
+          ssh-keyscan gitlab.integem.co | Out-File -FilePath $env:USERPROFILE\.ssh\known_hosts -Append
 
       - name: set node
         uses: actions/setup-node@v2
