@@ -26,16 +26,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Set up SSH for private repo access
-        shell: powershell
-        run: |
-          if (-Not (Test-Path -Path $env:USERPROFILE\.ssh)) {
-            mkdir $env:USERPROFILE\.ssh
-          }
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | Out-File -FilePath $env:USERPROFILE\.ssh\id_rsa -Encoding ascii
-          chmod 600 $env:USERPROFILE\.ssh\id_rsa
-          ssh-keyscan gitlab.integem.co | Out-File -FilePath $env:USERPROFILE\.ssh\known_hosts -Append
-
       - name: set node
         uses: actions/setup-node@v2
         with:
@@ -50,6 +40,16 @@ jobs:
           ls -alF
           git clone -b dev ${{secrets.GIT_ADDRESS}} .
         shell: bash
+
+      - name: Backup original package.json
+        run: cp package.json package.json.bak
+      - name: Modify package.json to use the git address with username and password
+        shell: bash
+        run: |
+          sed -i 's|git+ssh://git@gitlab.integem.co:jingxu.yang/igame.git|${{ secrets.IGAME_GIT_ADDRESS }}|' package.json
+      - name: Restore original package.json
+        run: mv package.json.bak package.json
+        
 
       - name: install
         run: npm i --legacy-peer-deps
